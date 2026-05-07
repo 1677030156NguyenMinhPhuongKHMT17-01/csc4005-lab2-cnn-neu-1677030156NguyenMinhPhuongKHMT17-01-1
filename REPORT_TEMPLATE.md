@@ -40,6 +40,7 @@ Phân loại 6 loại lỗi bề mặt thép (Crazing, Inclusion, Patches, Pitte
 |---|---|---:|---:|---:|---:|---|
 | MLP (Lab 1) | scratch | ~85% | ~84% | ~1 s | ~200k | Flatten mất cấu trúc không gian |
 | CNN-small | scratch | **94.44%** | **94.81%** | 4.20 s | 32.614 | Nhẹ, hội tụ tốt sau 20 epoch |
+| CNN-small (regularized) | scratch | 94.07% | 93.70% | 2.63 s | 32.614 | dropout=0.5, wd=1e-3 – không cải thiện thêm |
 | ResNet18 | transfer (frozen) | 96.67% | 96.30% | 12.58 s | 3.078 | Nhanh hội tụ, ít tham số train |
 | ResNet18 | finetune (full) | **100%** | **100%** | 34.99 s | 11.179.590 | Tốt nhất, nhưng nặng hơn |
 
@@ -53,6 +54,11 @@ Phân loại 6 loại lỗi bề mặt thép (Crazing, Inclusion, Patches, Pitte
 - `val_acc` đạt đỉnh **94.4%** ở epoch 16 và ổn định.
 - Scheduler `ReduceLROnPlateau` giảm lr từ 0.001 → 0.0005 → 0.00025 giúp mô hình hội tụ tinh.
 
+### CNN-small regularized (`cnn_small_regularized`)
+- dropout tăng lên 0.5, weight_decay tăng 1e-3, lr giảm 5e-4.
+- `val_acc` đạt 94.07%, thấp hơn baseline (94.44%) – regularization mạnh hơn làm mô hình train chậm hơn nhưng không cải thiện.
+- Kết luận: với NEU-CLS (1.800 ảnh), mức regularization baseline đã đủ tốt.
+
 ### ResNet18 transfer (frozen)
 - `val_acc` tăng mạnh ngay từ epoch 1 (~79.6%) vì backbone đã có sẵn đặc trưng ảnh.
 - Hội tụ nhanh hơn CNN scratch (10 epoch đủ), `val_acc` đạt **96.7%** epoch cuối.
@@ -65,17 +71,31 @@ Phân loại 6 loại lỗi bề mặt thép (Crazing, Inclusion, Patches, Pitte
 
 ## 6. Confusion matrix và lỗi dự đoán sai
 
-### CNN-small (test set, 270 mẫu)
+### CNN-small baseline (test set, 270 mẫu)
 - Phân loại đúng hoàn toàn: Crazing, Patches, Rolled-in\_Scale.
 - Lỗi chủ yếu: **Inclusion** bị nhầm sang Pitted\_Surface (5/45), **Pitted\_Surface** bị nhầm sang Inclusion (2/45) và Scratches (1/45), **Scratches** bị nhầm sang Inclusion (4/45).
 - Các cặp dễ nhầm: Inclusion ↔ Pitted\_Surface (texture tương tự), Scratches ↔ Inclusion.
+- Ảnh mẫu sai: `outputs/cnn_small_baseline/wrong_predictions.png`
+
+### CNN-small regularized (test set, 270 mẫu)
+- Kết quả nhìn chung tương tự baseline nhưng kém hơn một chút.
+- Mô hình vẫn nhầm Inclusion ↔ Pitted\_Surface và Scratches ↔ Inclusion.
+- Ảnh mẫu sai: `outputs/cnn_small_regularized/wrong_predictions.png`
 
 ### ResNet18 transfer (test set, 270 mẫu)
-- Lỗi ít hơn: Inclusion bị nhầm (7 mẫu), Crazing bị nhầm sang Patches (2 mẫu).
+- Lỗi ít hơn CNN scratch: Inclusion bị nhầm (7 mẫu), Crazing bị nhầm sang Patches (2 mẫu).
 - Rolled-in\_Scale phân loại hoàn hảo.
+- Ảnh mẫu sai: `outputs/resnet18_transfer/wrong_predictions.png`
 
 ### ResNet18 finetune (test set, 270 mẫu)
 - **0 lỗi** – confusion matrix hoàn toàn là đường chéo.
+
+### Phân tích chung các lỗi dự đoán sai
+Quan sát trực tiếp từ file `wrong_predictions.png` của các run:
+1. **Inclusion ↔ Pitted\_Surface**: Cả hai lớp đều có đặc trưng là các điểm/vết nhỏ trên bề mặt, khác nhau ở phân bố và hình dạng. CNN nhỏ khó phân biệt vùng ranh giới.
+2. **Scratches ↔ Inclusion**: Các vết xước có thể giống điểm bao gồm khi bị che khuất một phần.
+3. **Crazing ↔ Patches** (ResNet18 transfer): Cả hai có pattern lan rộng trên bề mặt, dễ nhầm khi độ tương phản thấp.
+4. Những mẫu sai thường có vùng lỗi không đặc trưng (ảnh mờ, góc chụp lạ, độ sáng khác nhau).
 
 ## 7. Kết luận
 

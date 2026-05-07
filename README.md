@@ -144,5 +144,6 @@ Khi đó:
 | Run | Test Acc | Avg Epoch Time | Trainable Params |
 |---|---:|---:|---:|
 | cnn_small_baseline | 94.81% | 4.20 s | 32.614 |
+| cnn_small_regularized | 93.70% | 2.63 s | 32.614 |
 | resnet18_transfer | 96.30% | 12.58 s | 3.078 |
 | resnet18_finetune | **100%** | 34.99 s | 11.179.590 |
