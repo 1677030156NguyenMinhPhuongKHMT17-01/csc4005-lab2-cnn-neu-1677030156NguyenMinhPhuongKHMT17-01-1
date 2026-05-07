@@ -131,10 +131,18 @@ Khi đó:
 3. vẫn có thể hoàn thành phần scratch CNN trước.
 
 ## 10. Checklist nộp bài
-- [ ] Có ít nhất 1 run CNN from scratch
-- [ ] Có ít nhất 1 run transfer learning
-- [ ] Có W&B dashboard
-- [ ] Có bảng so sánh MLP vs CNN scratch vs transfer
-- [ ] Có learning curves
-- [ ] Có confusion matrix
-- [ ] Có kết luận khi nào transfer learning tốt hơn
+- [x] Có ít nhất 1 run CNN from scratch → `cnn_small_baseline` (test acc = 94.81%)
+- [x] Có ít nhất 1 run transfer learning → `resnet18_transfer` (test acc = 96.30%) + `resnet18_finetune` (test acc = 100%)
+- [x] Có W&B dashboard → https://wandb.ai/shootingsaviorstar-discord/csc4005-lab2-neu-cnn
+- [x] Có bảng so sánh MLP vs CNN scratch vs transfer → xem `REPORT_TEMPLATE.md` mục 4
+- [x] Có learning curves → `outputs/<run_name>/curves.png`
+- [x] Có confusion matrix → `outputs/<run_name>/confusion_matrix.png`
+- [x] Có kết luận khi nào transfer learning tốt hơn → `REPORT_TEMPLATE.md` mục 7
+
+## 11. Kết quả tóm tắt
+
+| Run | Test Acc | Avg Epoch Time | Trainable Params |
+|---|---:|---:|---:|
+| cnn_small_baseline | 94.81% | 4.20 s | 32.614 |
+| resnet18_transfer | 96.30% | 12.58 s | 3.078 |
+| resnet18_finetune | **100%** | 34.99 s | 11.179.590 |
